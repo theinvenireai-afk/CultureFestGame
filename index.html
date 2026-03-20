@@ -1,1 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🌍 World Explorer — Learn About Cultures</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --asia:       #f97316;
+  --europe:     #6366f1;
+  --africa:     #eab308;
+  --americas:   #22c55e;
+  --oceania:    #06b6d4;
+  --bg:         #0f0e17;
+  --surface:    #1a1829;
+  --surface2:   #221f35;
+  --border:     rgba(255,255,255,0.08);
+  --text:       #f0eff7;
+  --muted:      #7c7a9a;
+  --radius:     20px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
 
+/* BG TEXTURE */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 800px 600px at 10% 20%, #6366f112, transparent),
+    radial-gradient(ellipse 600px 500px at 90% 80%, #f9731612, transparent),
+    radial-gradient(ellipse 500px 400px at 50% 50%, #22c55e08, transparent);
+}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(15,14,23,0.88);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+  gap:16px;
+}
+.nav-logo{
+  font-family:'Baloo 2',cursive;font-weight:900;font-size:1.3rem;
+  background:linear-gradient(135deg,#fbbf24,#f97316);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  white-space:nowrap;
+  text-decoration:none;
+}
+.nav-links{display:flex;gap:8px}
+.nav-link{
+  font-family:'Baloo 2',cursive;font-weight:700;font-size:.9rem;
+  padding:8px 18px;border-radius:999px;
+  text-decoration:none;color:var(--muted);
+  transition:all .2s;border:2px solid transparent;
+}
+.nav-link:hover{color:var(--text);background:var(--surface2)}
+.nav-link.active{color:white;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-color:#6366f1}
+.nav-quiz-btn{
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:.9rem;
+  padding:9px 22px;border-radius:999px;
+  background:linear-gradient(135deg,#f97316,#ec4899);
+  color:white;text-decoration:none;
+  box-shadow:0 4px 0 #9f1239,0 6px 20px #ec489944;
+  transition:all .2s;white-space:nowrap;
+}
+.nav-quiz-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #9f1239,0 10px 24px #ec489955}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:1;
+  text-align:center;
+  padding:60px 20px 40px;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:999px;padding:6px 18px;
+  font-size:.8rem;font-weight:800;color:var(--muted);
+  text-transform:uppercase;letter-spacing:2px;
+  margin-bottom:20px;
+  animation:fadeUp .6s both;
+}
+.hero h1{
+  font-family:'Baloo 2',cursive;font-weight:900;
+  font-size:clamp(2.4rem,6vw,4rem);
+  line-height:1.1;margin-bottom:14px;
+  animation:fadeUp .6s .1s both;
+}
+.hero h1 .line1{
+  background:linear-gradient(135deg,#f8fafc,#cbd5e1);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero h1 .line2{
+  background:linear-gradient(135deg,#fbbf24,#f97316,#ec4899);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero p{
+  font-size:1.1rem;color:var(--muted);font-weight:700;
+  max-width:520px;margin:0 auto 30px;line-height:1.6;
+  animation:fadeUp .6s .2s both;
+}
+.hero-stats{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  animation:fadeUp .6s .3s both;
+  margin-bottom:30px;
+}
+.stat-chip{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:999px;padding:8px 20px;
+  font-family:'Baloo 2',cursive;font-weight:700;font-size:.9rem;
+  color:var(--muted);display:flex;align-items:center;gap:6px;
+}
+.stat-chip strong{color:var(--text)}
+
+/* continent jump pills */
+.continent-nav{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:8px;
+  padding:0 20px 32px;
+  position:relative;z-index:1;
+  animation:fadeUp .6s .4s both;
+}
+.cont-pill{
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:.9rem;
+  padding:9px 20px;border-radius:999px;
+  border:2px solid transparent;
+  background:var(--surface);color:var(--muted);
+  cursor:pointer;text-decoration:none;
+  transition:all .2s;display:flex;align-items:center;gap:6px;
+}
+.cont-pill:hover{color:white;transform:translateY(-2px)}
+.cont-pill.asia:hover,.cont-pill.asia.sel{background:#f9731622;border-color:var(--asia);color:var(--asia)}
+.cont-pill.europe:hover,.cont-pill.europe.sel{background:#6366f122;border-color:var(--europe);color:var(--europe)}
+.cont-pill.africa:hover,.cont-pill.africa.sel{background:#eab30822;border-color:var(--africa);color:var(--africa)}
+.cont-pill.americas:hover,.cont-pill.americas.sel{background:#22c55e22;border-color:var(--americas);color:var(--americas)}
+.cont-pill.oceania:hover,.cont-pill.oceania.sel{background:#06b6d422;border-color:var(--oceania);color:var(--oceania)}
+
+/* ── MAIN CONTENT ── */
+main{position:relative;z-index:1;padding:0 20px 80px;max-width:1300px;margin:0 auto}
+
+/* ── CONTINENT SECTION ── */
+.continent-section{margin-bottom:56px}
+.continent-header{
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:20px;
+  padding-bottom:14px;
+  border-bottom:2px solid var(--border);
+}
+.continent-icon{font-size:2.2rem}
+.continent-title{
+  font-family:'Baloo 2',cursive;font-weight:900;font-size:1.7rem;
+}
+.continent-count{
+  font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;
+  padding:4px 12px;border-radius:999px;margin-left:auto;
+}
+.asia-theme    .continent-title{color:var(--asia)}
+.europe-theme  .continent-title{color:var(--europe)}
+.africa-theme  .continent-title{color:var(--africa)}
+.americas-theme .continent-title{color:var(--americas)}
+.oceania-theme  .continent-title{color:var(--oceania)}
+.asia-theme    .continent-count{background:#f9731618;color:var(--asia);border:1px solid #f9731630}
+.europe-theme  .continent-count{background:#6366f118;color:var(--europe);border:1px solid #6366f130}
+.africa-theme  .continent-count{background:#eab30818;color:var(--africa);border:1px solid #eab30830}
+.americas-theme .continent-count{background:#22c55e18;color:var(--americas);border:1px solid #22c55e30}
+.oceania-theme  .continent-count{background:#06b6d418;color:var(--oceania);border:1px solid #06b6d430}
+
+/* ── COUNTRY GRID ── */
+.country-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:16px;
+}
+
+/* ── COUNTRY CARD ── */
+.country-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s, border-color .25s;
+  position:relative;
+}
+.country-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 20px 50px rgba(0,0,0,.45);
+}
+.asia-theme    .country-card:hover{border-color:#f9731640;box-shadow:0 20px 50px #f9731618}
+.europe-theme  .country-card:hover{border-color:#6366f140;box-shadow:0 20px 50px #6366f118}
+.africa-theme  .country-card:hover{border-color:#eab30840;box-shadow:0 20px 50px #eab30818}
+.americas-theme .country-card:hover{border-color:#22c55e40;box-shadow:0 20px 50px #22c55e18}
+.oceania-theme  .country-card:hover{border-color:#06b6d440;box-shadow:0 20px 50px #06b6d418}
+
+.card-top{
+  height:90px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;
+  position:relative;
+  overflow:hidden;
+}
+.asia-theme    .card-top{background:linear-gradient(135deg,#431407,#7c2d12)}
+.europe-theme  .card-top{background:linear-gradient(135deg,#1e1b4b,#312e81)}
+.africa-theme  .card-top{background:linear-gradient(135deg,#422006,#78350f)}
+.americas-theme .card-top{background:linear-gradient(135deg,#052e16,#14532d)}
+.oceania-theme  .card-top{background:linear-gradient(135deg,#083344,#0c4a6e)}
+
+.card-top .flag{
+  position:relative;z-index:1;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));
+  transition:transform .3s;
+}
+.country-card:hover .flag{transform:scale(1.15) rotate(3deg)}
+.card-top::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 120%,rgba(255,255,255,.07),transparent 70%);
+}
+
+.card-body{padding:14px 16px 16px}
+.card-name{
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:1.15rem;
+  color:var(--text);margin-bottom:6px;
+}
+.card-meta{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  margin-bottom:10px;
+}
+.meta-item{
+  background:var(--surface2);border-radius:10px;
+  padding:6px 8px;font-size:.72rem;
+}
+.meta-label{color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.5px;display:block}
+.meta-val{font-weight:800;font-size:.82rem;color:var(--text)}
+
+.card-snippet{
+  font-size:.8rem;color:var(--muted);font-weight:700;
+  line-height:1.5;border-top:1px solid var(--border);
+  padding-top:10px;
+}
+.learn-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-top:12px;
+  padding:9px;border-radius:12px;
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:.85rem;
+  color:white;border:none;cursor:pointer;width:100%;
+  transition:all .2s;
+}
+.asia-theme    .learn-btn{background:linear-gradient(135deg,#ea580c,#f97316)}
+.europe-theme  .learn-btn{background:linear-gradient(135deg,#4f46e5,#6366f1)}
+.africa-theme  .learn-btn{background:linear-gradient(135deg,#ca8a04,#eab308)}
+.americas-theme .learn-btn{background:linear-gradient(135deg,#16a34a,#22c55e)}
+.oceania-theme  .learn-btn{background:linear-gradient(135deg,#0891b2,#06b6d4)}
+
+.learn-btn:hover{filter:brightness(1.15);transform:scale(1.02)}
+
+/* ── MODAL ── */
+.modal-backdrop{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.modal-backdrop.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:28px;
+  max-width:560px;width:100%;
+  max-height:90vh;overflow-y:auto;
+  transform:scale(.9) translateY(20px);
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 40px 100px rgba(0,0,0,.6);
+  position:relative;
+}
+.modal-backdrop.open .modal{transform:scale(1) translateY(0)}
+
+.modal-hero{
+  height:160px;display:flex;align-items:center;justify-content:center;
+  font-size:6rem;border-radius:28px 28px 0 0;
+  position:relative;overflow:hidden;
+}
+.modal-hero .glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 100%,rgba(255,255,255,.08),transparent 70%);
+}
+.modal-body{padding:24px}
+.modal-flag-name{
+  display:flex;align-items:center;gap:12px;margin-bottom:6px;
+}
+.modal-country-name{
+  font-family:'Baloo 2',cursive;font-weight:900;font-size:1.9rem;color:var(--text)
+}
+.modal-continent-tag{
+  font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;
+  padding:4px 12px;border-radius:999px;margin-bottom:18px;display:inline-block;
+}
+.modal-facts-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;
+}
+.mfact{
+  background:var(--surface2);border-radius:14px;padding:12px 14px;
+}
+.mfact-icon{font-size:1.5rem;margin-bottom:4px}
+.mfact-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:2px}
+.mfact-val{font-size:.9rem;font-weight:800;color:var(--text)}
+
+.modal-section-title{
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;
+  color:var(--muted);text-transform:uppercase;letter-spacing:2px;
+  margin:18px 0 8px;
+}
+.modal-funfact{
+  background:var(--surface2);border-radius:14px;padding:14px 16px;
+  font-weight:700;font-size:.95rem;line-height:1.6;color:var(--text);
+  border-left:4px solid;
+}
+.modal-traditions{list-style:none;display:flex;flex-direction:column;gap:8px}
+.modal-traditions li{
+  background:var(--surface2);border-radius:12px;padding:10px 14px;
+  font-weight:700;font-size:.88rem;display:flex;align-items:flex-start;gap:10px;line-height:1.5;
+}
+.modal-traditions li span:first-child{font-size:1.2rem;flex-shrink:0}
+
+.modal-close{
+  position:absolute;top:14px;right:14px;
+  background:rgba(255,255,255,.1);border:none;
+  color:white;border-radius:50%;width:36px;height:36px;
+  font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;z-index:10;
+}
+.modal-close:hover{background:rgba(255,255,255,.2);transform:rotate(90deg)}
+.modal-quiz-cta{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:18px;padding:13px;border-radius:14px;
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;
+  color:white;border:none;cursor:pointer;width:100%;
+  background:linear-gradient(135deg,#f97316,#ec4899);
+  box-shadow:0 4px 0 #9f1239,0 6px 20px #ec489944;
+  transition:all .2s;text-decoration:none;
+}
+.modal-quiz-cta:hover{transform:translateY(-2px);box-shadow:0 6px 0 #9f1239,0 10px 24px #ec489955}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;padding:24px;
+  color:var(--muted);font-size:.85rem;font-weight:700;
+  border-top:1px solid var(--border);
+  position:relative;z-index:1;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.country-card{animation:fadeUp .5s both}
+
+/* stagger per card */
+.country-card:nth-child(1){animation-delay:.05s}
+.country-card:nth-child(2){animation-delay:.1s}
+.country-card:nth-child(3){animation-delay:.15s}
+.country-card:nth-child(4){animation-delay:.2s}
+.country-card:nth-child(5){animation-delay:.25s}
+.country-card:nth-child(6){animation-delay:.3s}
+
+@media(max-width:640px){
+  .modal-facts-grid{grid-template-columns:1fr 1fr}
+  .country-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  nav{padding:0 12px}
+  .nav-link{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">🌍 World Explorer</a>
+  <div class="nav-links">
+    <a class="nav-link active" href="index.html">📚 Learn</a>
+    <a class="nav-link" href="quiz.html">🎯 Quiz</a>
+  </div>
+  <a class="nav-quiz-btn" href="quiz.html">🎯 Take the Quiz!</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🌐 Educational · Kid-Friendly · Interactive</div>
+  <h1>
+    <span class="line1">Explore the World's</span><br>
+    <span class="line2">Amazing Cultures 🌍</span>
+  </h1>
+  <p>Click on any country card to discover its flag, language, food, traditions, and fun facts — then test yourself in the Quiz!</p>
+  <div class="hero-stats">
+    <div class="stat-chip">🌏 <strong>5</strong> Continents</div>
+    <div class="stat-chip">🏳️ <strong>20</strong> Countries</div>
+    <div class="stat-chip">💡 <strong>80+</strong> Fun Facts</div>
+  </div>
+</section>
+
+<!-- CONTINENT FILTER PILLS -->
+<div class="continent-nav">
+  <a class="cont-pill asia sel" href="#asia">🌏 Asia</a>
+  <a class="cont-pill europe" href="#europe">🏰 Europe</a>
+  <a class="cont-pill africa" href="#africa">🌍 Africa</a>
+  <a class="cont-pill americas" href="#americas">🌎 Americas</a>
+  <a class="cont-pill oceania" href="#oceania">🏝️ Oceania</a>
+</div>
+
+<!-- MAIN -->
+<main id="main-content"></main>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-hero" id="modal-hero"><div class="glow"></div><span id="modal-flag-big"></span></div>
+    <div class="modal-body">
+      <div class="modal-flag-name">
+        <span id="modal-name" class="modal-country-name"></span>
+      </div>
+      <span class="modal-continent-tag" id="modal-cont-tag"></span>
+      <div class="modal-facts-grid" id="modal-facts-grid"></div>
+      <div class="modal-section-title">✨ Fun Fact</div>
+      <div class="modal-funfact" id="modal-funfact"></div>
+      <div class="modal-section-title">🎎 Traditions & Culture</div>
+      <ul class="modal-traditions" id="modal-traditions"></ul>
+      <a class="modal-quiz-cta" href="quiz.html">🎯 Test Your Knowledge — Take the Quiz!</a>
+    </div>
+  </div>
+</div>
+
+<footer>Made with ❤️ for curious kids everywhere · <a href="quiz.html" style="color:#f97316;text-decoration:none">Take the Culture Quiz →</a></footer>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const DATA = {
+  asia: {
+    label:"Asia", icon:"🌏", color:"var(--asia)",
+    countries:[
+      { flag:"🇯🇵", name:"Japan", capital:"Tokyo", language:"Japanese", food:"Sushi 🍣", animal:"Macaque 🐒",
+        snippet:"Land of cherry blossoms, samurai, and neon-lit cities.",
+        funFact:"Japan has more vending machines per person than any country on Earth — you can even buy hot ramen from them! 🍜",
+        traditions:["🌸 Hanami — people gather under cherry blossom trees every spring to celebrate","🎎 Girls' Day (Hinamatsuri) — families display beautiful doll sets on March 3rd","🏯 Tea ceremonies — preparing and drinking matcha tea is treated as a mindful art","⛩️ Visiting shrines on New Year's Day for good luck blessings"] },
+      { flag:"🇮🇳", name:"India", capital:"New Delhi", language:"Hindi + 21 others", food:"Biryani 🍛", animal:"Bengal Tiger 🐯",
+        snippet:"Home of the Taj Mahal, Bollywood, and the number zero!",
+        funFact:"India invented chess, the game of Snakes and Ladders, and the decimal number system — including zero! 🎲",
+        traditions:["🪔 Diwali — the Festival of Lights when millions of oil lamps are lit everywhere","🎨 Holi — the joyful festival of colours where people throw bright powder","💃 Bharatanatyam — one of the oldest classical dance forms in the world","🐘 Pongal — a harvest festival thanking nature and animals"] },
+      { flag:"🇨🇳", name:"China", capital:"Beijing", language:"Mandarin", food:"Dumplings 🥟", animal:"Giant Panda 🐼",
+        snippet:"Ancient civilisation with the world's longest wall.",
+        funFact:"The Great Wall of China is so long it would take about 18 months to walk its entire length! 🧱",
+        traditions:["🐉 Chinese New Year — 15-day celebration with dragon dances and fireworks","🏮 Lantern Festival — glowing lanterns are floated on rivers and into the sky","🎋 Qingming Festival — families honour ancestors by cleaning graves and flying kites","🥢 Dim sum brunches — shared small dishes are a beloved Sunday tradition"] },
+      { flag:"🇹🇭", name:"Thailand", capital:"Bangkok", language:"Thai", food:"Pad Thai 🍜", animal:"Elephant 🐘",
+        snippet:"The Land of Smiles with golden temples and spicy food.",
+        funFact:"In Thailand, elephants are considered sacred and appear on many national symbols. White elephants are especially precious! 🐘",
+        traditions:["💦 Songkran — Thai New Year celebrated by splashing water on everyone!","🙏 Wai greeting — pressing palms together and bowing as a respectful hello","🌺 Loi Krathong — floating flower boats on rivers under a full moon","🛕 Monk alms rounds — Buddhist monks walk barefoot at dawn collecting food"] },
+      { flag:"🇸🇦", name:"Saudi Arabia", capital:"Riyadh", language:"Arabic", food:"Kabsa 🍚", animal:"Arabian Camel 🐪",
+        snippet:"Desert kingdom with ancient trade routes and world-famous dates.",
+        funFact:"Saudi Arabia contains about 25% of all the world's proven oil reserves. It's also home to the two holiest cities in Islam! 🕌",
+        traditions:["☕ Arabic coffee — cardamom-spiced coffee served to every guest as a welcome","🐪 Camel racing — a beloved sport with robot jockeys in modern races!","🎉 National Day celebrations — fireworks and traditional dances fill the streets","🌙 Ramadan — a month of fasting, prayer, and evening feasts with family"] }
+    ]
+  },
+  europe: {
+    label:"Europe", icon:"🏰", color:"var(--europe)",
+    countries:[
+      { flag:"🇫🇷", name:"France", capital:"Paris", language:"French", food:"Croissant 🥐", animal:"Gallic Rooster 🐓",
+        snippet:"City of Light, fashion, fine food, and the Eiffel Tower.",
+        funFact:"France is the most visited country in the world, welcoming over 90 million tourists every year! 🗼",
+        traditions:["🥖 Boulangerie culture — fresh baguettes bought daily is a national ritual","🎭 Bastille Day — fireworks and parades celebrate the French Revolution every July 14","🏆 Tour de France — the world's most famous bicycle race circles the country","🧀 Cheese tradition — France makes over 1,000 varieties of cheese!"] },
+      { flag:"🇮🇹", name:"Italy", capital:"Rome", language:"Italian", food:"Pizza 🍕", animal:"Italian Wolf 🐺",
+        snippet:"Boot-shaped land of pizza, pasta, art, and ancient ruins.",
+        funFact:"Italians invented ice cream, the piano, the battery, and eyeglasses! Italy is shaped exactly like a high-heeled boot on the map. 👢",
+        traditions:["🍝 Sunday family lunch — a multi-hour feast is the week's most important meal","⚽ Calcio Storico — a 500-year-old, extremely rough football game played in Florence","🎭 Venice Carnival — elaborate masks and costumes fill the city in February","☕ Espresso culture — Italians drink small, strong coffee standing at a bar counter"] },
+      { flag:"🇬🇷", name:"Greece", capital:"Athens", language:"Greek", food:"Moussaka 🍆", animal:"Dolphin 🐬",
+        snippet:"Birthplace of democracy, the Olympics, and Western philosophy.",
+        funFact:"The first Olympic Games were held in Olympia, Greece in 776 BC — over 2,800 years ago! The torch relay tradition continues today. 🏅",
+        traditions:["🫒 Olive harvest — families gather to pick olives and press them into oil","💃 Traditional dances — Zorba-style circle dances at every celebration","🐑 Easter celebrations — the biggest holiday, with lamb roasts and midnight church bells","🏛️ Name days — celebrated more than birthdays in Greek Orthodox tradition"] },
+      { flag:"🇳🇴", name:"Norway", capital:"Oslo", language:"Norwegian", food:"Salmon 🐟", animal:"Moose 🫎",
+        snippet:"Land of fjords, Northern Lights, and fearless Vikings.",
+        funFact:"Norway has one of the longest coastlines in the world. The country is so far north that in summer, the sun never fully sets — it's called the Midnight Sun! ☀️",
+        traditions:["🎿 Skiing culture — Norwegians say 'Norwegians are born with skis on their feet'","🪄 Constitution Day (Syttende Mai) — children parade in traditional bunad costumes","🌊 Fjord celebrations — summer festivals held on the scenic waterways","🌌 Aurora Borealis watching — entire villages go outside to watch the dancing Northern Lights"] },
+      { flag:"🇪🇸", name:"Spain", capital:"Madrid", language:"Spanish", food:"Paella 🥘", animal:"Bull 🐂",
+        snippet:"Passionate land of flamenco dancing, siestas, and tapas.",
+        funFact:"Spain is home to La Tomatina — a festival where thousands of people throw tomatoes at each other just for fun! 🍅",
+        traditions:["💃 Flamenco — an emotional, foot-stomping dance born in Andalusia","🥘 Tapas tradition — small dishes shared over long, lively dinner conversations","😴 Siesta — a midday rest break when many shops close for a few hours","🎊 Feria de Abril — Seville's April Fair has horses, flamenco, and lantern-lit tents"] }
+    ]
+  },
+  africa: {
+    label:"Africa", icon:"🌍", color:"var(--africa)",
+    countries:[
+      { flag:"🇪🇬", name:"Egypt", capital:"Cairo", language:"Arabic", food:"Koshari 🍲", animal:"Camel 🐪",
+        snippet:"Ancient land of pharaohs, pyramids, and the mighty Nile.",
+        funFact:"Ancient Egyptians invented papyrus paper, the 365-day calendar, toothpaste, and even high heels! 📜",
+        traditions:["🏺 Pharaonic celebrations — re-enactments of ancient ceremonies at Luxor temples","🌙 Ramadan nights — streets fill with lanterns, music, and huge communal meals","👁️ Evil eye charms — blue hamsa amulets protect homes and cars from bad luck","🎉 Sham El-Nessim — spring picnic festival dating back over 4,000 years!"] },
+      { flag:"🇳🇬", name:"Nigeria", capital:"Abuja", language:"English + Yoruba", food:"Jollof Rice 🍚", animal:"Eagle 🦅",
+        snippet:"Africa's most populous nation — the Giant of Africa!",
+        funFact:"Nigeria produces more movies than Hollywood! Nollywood is the world's second-largest film industry with over 2,500 films per year. 🎬",
+        traditions:["🥁 Talking drums — drums that mimic the tones of Yoruba language to send messages","👘 Aso Ebi — family members wear matching outfits to weddings and celebrations","🎭 New Yam Festival — the Igbo people celebrate the harvest with masquerades","🤝 Kola nut ceremony — sharing kola nuts is the most respectful welcome to guests"] },
+      { flag:"🇰🇪", name:"Kenya", capital:"Nairobi", language:"Swahili + English", food:"Ugali 🫓", animal:"Lion 🦁",
+        snippet:"Land of the Great Migration, Maasai warriors, and Mount Kenya.",
+        funFact:"Every year, over 1.5 million wildebeest migrate across Kenya's Maasai Mara in what is called the Greatest Show on Earth! 🦁",
+        traditions:["🏃 Running culture — Kenya has produced more world marathon champions than any country","💿 Beaded jewellery — Maasai women create intricate beaded necklaces for every occasion","🦒 Safari tradition — wildlife watching has been a cultural practice for centuries","🎵 Ohangla music — traditional Luo songs played with nyatiti string instruments"] },
+      { flag:"🇿🇦", name:"South Africa", capital:"Pretoria", language:"11 official languages!", food:"Braai 🍖", animal:"Springbok 🦌",
+        snippet:"Rainbow Nation with 11 languages, safaris, and Cape Town.",
+        funFact:"South Africa is the only country in the world that has three capital cities — Pretoria, Cape Town, and Bloemfontein! 🏙️",
+        traditions:["🔥 Braai — outdoor barbecue is a national obsession, like a sacred tradition","🌈 Heritage Day (Braai Day) — celebrated on September 24th with — you guessed it — braais!","💃 Gumboot dance — miners created this stomping dance to communicate in dark tunnels","🏉 Rugby — the Springboks winning the World Cup causes nationwide celebrations"] },
+      { flag:"🇲🇦", name:"Morocco", capital:"Rabat", language:"Arabic + Berber", food:"Tagine 🫕", animal:"Barbary Lion 🦁",
+        snippet:"Gateway to Africa with ancient medinas and Sahara dunes.",
+        funFact:"Morocco's city of Fes has the world's oldest university still in operation — the University of Al Quaraouiyine, founded in 859 AD! 📚",
+        traditions:["🍵 Mint tea ceremony — serving three glasses of sweet mint tea to guests is a must","🏺 Hammam baths — communal steam bathhouses are a weekly social ritual","🐪 Berber festivals — desert nomads celebrate with music, storytelling, and camel races","🧿 Henna art — intricate patterns painted on hands for weddings and celebrations"] }
+    ]
+  },
+  americas: {
+    label:"Americas", icon:"🌎", color:"var(--americas)",
+    countries:[
+      { flag:"🇧🇷", name:"Brazil", capital:"Brasília", language:"Portuguese", food:"Açaí Bowl 🍇", animal:"Toucan 🦜",
+        snippet:"Largest country in South America with the Amazon and Carnival!",
+        funFact:"Brazil is home to the Amazon River, which discharges more water into the ocean than the next seven largest rivers combined! 🌊",
+        traditions:["🎉 Rio Carnival — the world's biggest party with samba, feathers, and 2 million people dancing","⚽ Football passion — Brazilians treat football as a religion; streets empty during big matches","🌿 Capoeira — a martial art disguised as dance, invented by enslaved Africans","🥁 Samba schools — neighbourhood groups spend the entire year preparing Carnival costumes"] },
+      { flag:"🇲🇽", name:"Mexico", capital:"Mexico City", language:"Spanish", food:"Tacos 🌮", animal:"Golden Eagle 🦅",
+        snippet:"Ancient Aztec homeland with pyramids, mariachi, and tacos!",
+        funFact:"Mexico has the world's largest pyramid by volume — the Great Pyramid of Cholula — it looks like a hill with a church on top! ⛪",
+        traditions:["💀 Día de los Muertos — a joyful celebration to honour deceased loved ones with marigolds","🎺 Mariachi music — strolling bands in matching suits serenade people at celebrations","🎊 Piñata tradition — breaking a star-shaped piñata at birthday parties for candy","🌽 Tortilla making — handmade tortillas patted from masa dough are an everyday art"] },
+      { flag:"🇨🇦", name:"Canada", capital:"Ottawa", language:"English + French", food:"Poutine 🍟", animal:"Beaver 🦫",
+        snippet:"Vast wilderness nation of maple syrup, hockey, and kindness!",
+        funFact:"Canada has the longest coastline of any country in the world, stretching over 202,000 kilometres! That's more than 5 times around Earth. 🌊",
+        traditions:["🍁 Maple syrup festivals — Quebec's sugaring-off season in spring is celebrated with pancake parties","🏒 Hockey culture — Canadians treat ice hockey as a national religion","🐻 Pow Wows — Indigenous peoples gather for ceremonial dances, drumming, and community","🎄 Winter festivals — Quebec City's Carnival features ice sculptures and canoe races on the icy river"] },
+      { flag:"🇵🇪", name:"Peru", capital:"Lima", language:"Spanish + Quechua", food:"Ceviche 🍋", animal:"Llama 🦙",
+        snippet:"Land of the Inca Empire, Machu Picchu, and the Andes mountains.",
+        funFact:"The ancient Inca city of Machu Picchu was built without using any mortar — the stones fit so perfectly together you can't slip a card between them! 🏔️",
+        traditions:["🎉 Inti Raymi — the Festival of the Sun, celebrating the Incan sun god with colourful processions","🪘 Marinera dance — Peru's national dance is an elegant, waving-handkerchief courtship dance","🦙 Llama herding — Andean communities have herded llamas for 5,000 years for wool and transport","🥔 Potato celebration — Peru has over 3,000 varieties of potato and holds annual potato festivals"] },
+      { flag:"🇺🇸", name:"USA", capital:"Washington D.C.", language:"English", food:"Burgers 🍔", animal:"Bald Eagle 🦅",
+        snippet:"Land of jazz, Hollywood, national parks, and 50 diverse states.",
+        funFact:"The US has the world's largest economy and is home to over 330 million people from every country on Earth — a true melting pot! 🗽",
+        traditions:["🦃 Thanksgiving — a November harvest feast with turkey, family, and gratitude","🎆 Fourth of July — independence celebrated with spectacular fireworks nationwide","🏈 Super Bowl Sunday — America's biggest sporting event is basically a national holiday","🎃 Halloween — dressing in costumes and trick-or-treating is beloved by children and adults alike"] }
+    ]
+  },
+  oceania: {
+    label:"Oceania", icon:"🏝️", color:"var(--oceania)",
+    countries:[
+      { flag:"🇦🇺", name:"Australia", capital:"Canberra", language:"English", food:"Meat Pie 🥧", animal:"Kangaroo 🦘",
+        snippet:"The continent-country with kangaroos, coral reefs, and red deserts.",
+        funFact:"Australia has more venomous animals than any other country — including the world's most venomous spider, snake, jellyfish, and octopus! 🐍",
+        traditions:["🏄 Surf culture — beach life and surfing is part of everyday Australian identity","🪃 Boomerang throwing — an ancient Indigenous hunting tool now used in sport and art","🎸 ANZAC Day — honouring soldiers with dawn services, marches, and two-up coin games","🌿 Bush Tucker traditions — Indigenous Australians forage native plants and animals for food"] },
+      { flag:"🇳🇿", name:"New Zealand", capital:"Wellington", language:"English + Māori", food:"Pavlova 🍰", animal:"Kiwi 🥝",
+        snippet:"First nation to give women the vote — land of hobbits and haka!",
+        funFact:"New Zealand was the first country in the world to give women the right to vote, back in 1893 — 27 years before the USA! 🗳️",
+        traditions:["🏉 Haka — the Māori war dance performed by the All Blacks rugby team before every match","🌺 Pōwhiri — a formal Māori welcome ceremony with song, speech, and hongi (nose touching)","🎣 Whitebait fritters — a beloved spring tradition of catching tiny fish and frying them in batter","🪄 Matariki — Māori New Year celebration in June when the Pleiades star cluster rises"] },
+      { flag:"🇫🇯", name:"Fiji", capital:"Suva", language:"English + Fijian", food:"Kokoda 🐟", animal:"Collared Lory 🦜",
+        snippet:"Island paradise with 333 islands and the world's warmest people.",
+        funFact:"Fiji's traditional firewalking ceremony — where men walk barefoot over white-hot stones — has been performed for over 500 years! 🔥",
+        traditions:["🥥 Kava ceremony — drinking the earthy kava root drink is how Fijians welcome guests","🎵 Meke dance — storytelling through traditional songs and fans at every major event","🔥 Vilavilairevo — the ancient firewalking ritual that still amazes scientists","🤲 Sevusevu — presenting a bundle of kava roots is the proper respectful greeting"] }
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+const THEME_CLASSES = {
+  asia:'asia-theme', europe:'europe-theme', africa:'africa-theme',
+  americas:'americas-theme', oceania:'oceania-theme'
+};
+const CONT_LABELS = {
+  asia:'🌏 Asia', europe:'🏰 Europe', africa:'🌍 Africa',
+  americas:'🌎 Americas', oceania:'🏝️ Oceania'
+};
+
+function buildPage() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = '';
+  Object.entries(DATA).forEach(([key, cont]) => {
+    const sec = document.createElement('section');
+    sec.className = `continent-section ${THEME_CLASSES[key]}`;
+    sec.id = key;
+
+    sec.innerHTML = `
+      <div class="continent-header">
+        <span class="continent-icon">${cont.icon}</span>
+        <h2 class="continent-title">${cont.label}</h2>
+        <span class="continent-count">${cont.countries.length} Countries</span>
+      </div>
+      <div class="country-grid">
+        ${cont.countries.map(c => countryCard(c, key)).join('')}
+      </div>`;
+    main.appendChild(sec);
+  });
+}
+
+function countryCard(c, continent) {
+  return `
+  <div class="country-card" onclick="openModal('${encodeURIComponent(JSON.stringify({...c,continent}))}')">
+    <div class="card-top"><span class="flag">${c.flag}</span></div>
+    <div class="card-body">
+      <div class="card-name">${c.flag} ${c.name}</div>
+      <div class="card-meta">
+        <div class="meta-item"><span class="meta-label">Capital</span><span class="meta-val">🏙️ ${c.capital}</span></div>
+        <div class="meta-item"><span class="meta-label">Language</span><span class="meta-val">💬 ${c.language.split('+')[0].trim()}</span></div>
+        <div class="meta-item"><span class="meta-label">Food</span><span class="meta-val">${c.food}</span></div>
+        <div class="meta-item"><span class="meta-label">Animal</span><span class="meta-val">${c.animal}</span></div>
+      </div>
+      <p class="card-snippet">${c.snippet}</p>
+      <button class="learn-btn">📖 Learn More</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════
+const CONT_COLORS = {
+  asia:'#f97316', europe:'#6366f1', africa:'#eab308', americas:'#22c55e', oceania:'#06b6d4'
+};
+const CONT_BG = {
+  asia:'linear-gradient(135deg,#431407,#7c2d12)',
+  europe:'linear-gradient(135deg,#1e1b4b,#312e81)',
+  africa:'linear-gradient(135deg,#422006,#78350f)',
+  americas:'linear-gradient(135deg,#052e16,#14532d)',
+  oceania:'linear-gradient(135deg,#083344,#0c4a6e)'
+};
+
+function openModal(encoded) {
+  const c = JSON.parse(decodeURIComponent(encoded));
+  const color = CONT_COLORS[c.continent];
+
+  document.getElementById('modal-hero').style.background = CONT_BG[c.continent];
+  document.getElementById('modal-flag-big').textContent = c.flag;
+  document.getElementById('modal-name').textContent = c.name;
+
+  const tag = document.getElementById('modal-cont-tag');
+  tag.textContent = CONT_LABELS[c.continent];
+  tag.style.background = color + '22';
+  tag.style.color = color;
+  tag.style.border = `1px solid ${color}44`;
+
+  document.getElementById('modal-facts-grid').innerHTML = `
+    <div class="mfact"><div class="mfact-icon">🏙️</div><div class="mfact-label">Capital</div><div class="mfact-val">${c.capital}</div></div>
+    <div class="mfact"><div class="mfact-icon">💬</div><div class="mfact-label">Language</div><div class="mfact-val">${c.language}</div></div>
+    <div class="mfact"><div class="mfact-icon">🍽️</div><div class="mfact-label">Famous Food</div><div class="mfact-val">${c.food}</div></div>
+    <div class="mfact"><div class="mfact-icon">🐾</div><div class="mfact-label">National Animal</div><div class="mfact-val">${c.animal}</div></div>`;
+
+  const ff = document.getElementById('modal-funfact');
+  ff.textContent = c.funFact;
+  ff.style.borderLeftColor = color;
+
+  document.getElementById('modal-traditions').innerHTML =
+    c.traditions.map(t => `<li><span>${t.split(' — ')[0].split(' ')[0]}</span><span>${t}</span></li>`).join('');
+
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-backdrop')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Continent pill highlight on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.cont-pill').forEach(p => p.classList.remove('sel'));
+      const pill = document.querySelector(`.cont-pill.${e.target.id}`);
+      if (pill) pill.classList.add('sel');
+    }
+  });
+}, { threshold: 0.3 });
+
+buildPage();
+document.querySelectorAll('.continent-section').forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
