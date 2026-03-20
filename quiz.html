@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🎯 World Explorer — Culture Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f172a;--card:#1e293b;--border:rgba(255,255,255,.1);
+  --text:#f1f5f9;--muted:#94a3b8;--accent:#6366f1;
+  --green:#22c55e;--red:#ef4444;--gold:#fbbf24;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 700px 500px at 15% 20%,#312e8155,transparent),
+    radial-gradient(ellipse 600px 400px at 85% 80%,#064e3b44,transparent);}
+nav{position:sticky;top:0;z-index:200;background:rgba(15,23,42,.92);
+  backdrop-filter:blur(16px);border-bottom:1px solid var(--border);
+  padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:66px;}
+.nav-logo{font-family:'Baloo 2',cursive;font-size:1.4rem;font-weight:900;
+  background:linear-gradient(135deg,#fbbf24,#f97316);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;}
+.nav-back{font-family:'Baloo 2',cursive;font-weight:700;font-size:.95rem;
+  padding:8px 18px;border-radius:999px;text-decoration:none;
+  color:var(--muted);border:1.5px solid var(--border);transition:all .2s;}
+.nav-back:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+.page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:32px 20px 80px}
+.screen{display:none}.screen.active{display:block}
+
+/* HOME */
+.home-hero{text-align:center;margin-bottom:40px}
+.home-badge{display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#312e81,#4c1d95);border:1.5px solid #6366f155;
+  color:#a78bfa;border-radius:999px;padding:7px 18px;font-weight:800;font-size:.85rem;
+  margin-bottom:18px;letter-spacing:.5px;}
+.home-title{font-family:'Baloo 2',cursive;font-size:clamp(2.2rem,6vw,3.5rem);font-weight:900;line-height:1.1;margin-bottom:14px;}
+.home-title .g1{background:linear-gradient(135deg,#fbbf24,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.home-title .g2{background:linear-gradient(135deg,#34d399,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.home-sub{color:var(--muted);font-size:1.05rem;font-weight:700;max-width:480px;margin:0 auto 36px;line-height:1.6}
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:40px}
+.mode-card{background:var(--card);border:2px solid var(--border);border-radius:22px;padding:24px 20px;
+  cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);text-align:center;position:relative;overflow:hidden;}
+.mode-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s;}
+.mode-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.2)}
+.mode-card:hover::before{opacity:1}
+.mode-card.mode-easy::before{background:linear-gradient(135deg,#065f4622,#10b98122)}
+.mode-card.mode-medium::before{background:linear-gradient(135deg,#312e8122,#6366f122)}
+.mode-card.mode-hard::before{background:linear-gradient(135deg,#7f1d1d22,#ef444422)}
+.mode-card.mode-continent::before{background:linear-gradient(135deg,#78350f22,#f9731622)}
+.mode-icon{font-size:3rem;margin-bottom:10px;display:block}
+.mode-name{font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:800;margin-bottom:6px}
+.mode-desc{font-size:.85rem;color:var(--muted);font-weight:700;line-height:1.5}
+.mode-badge{display:inline-block;margin-top:10px;font-size:.75rem;font-weight:800;padding:4px 12px;
+  border-radius:999px;letter-spacing:.5px;text-transform:uppercase;}
+.mode-badge.easy{background:#065f46;color:#34d399}
+.mode-badge.medium{background:#312e81;color:#a78bfa}
+.mode-badge.hard{background:#7f1d1d;color:#fca5a5}
+.mode-badge.custom{background:#78350f;color:#fbbf24}
+.continent-select-title{font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:800;text-align:center;margin-bottom:16px;}
+.continent-btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:24px}
+.cont-btn{font-family:'Baloo 2',cursive;font-weight:800;font-size:.95rem;
+  padding:10px 22px;border-radius:999px;border:2px solid var(--border);
+  background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s;}
+.cont-btn.sel-all{background:linear-gradient(135deg,#f97316,#ec4899);border-color:transparent;color:white}
+.cont-btn.sel-asia{background:#f97316;border-color:transparent;color:white}
+.cont-btn.sel-europe{background:#6366f1;border-color:transparent;color:white}
+.cont-btn.sel-africa{background:#eab308;border-color:transparent;color:#1e1b18}
+.cont-btn.sel-americas{background:#22c55e;border-color:transparent;color:white}
+.cont-btn.sel-oceania{background:#06b6d4;border-color:transparent;color:white}
+.start-quiz-btn{display:block;margin:0 auto;font-family:'Baloo 2',cursive;font-weight:800;font-size:1.1rem;
+  padding:15px 40px;border-radius:999px;border:none;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;cursor:pointer;
+  box-shadow:0 6px 0 #3730a3;transition:all .2s;}
+.start-quiz-btn:hover{transform:translateY(-3px);box-shadow:0 9px 0 #3730a3}
+
+/* QUIZ */
+.quiz-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.q-number{font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;color:var(--muted);}
+.progress-wrap{flex:1;min-width:120px}
+.progress-track{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#6366f1,#a78bfa);border-radius:999px;transition:width .4s ease;}
+.q-score-pill{font-family:'Baloo 2',cursive;font-weight:800;font-size:.95rem;
+  background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:999px;
+  padding:6px 16px;display:flex;align-items:center;gap:6px;}
+.q-score-pill .sv{color:var(--gold)}
+.question-card{background:var(--card);border-radius:24px;border:2px solid var(--border);
+  padding:28px 24px;margin-bottom:18px;position:relative;overflow:hidden;}
+.question-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,#6366f1,#ec4899,#fbbf24);}
+.q-type-badge{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;
+  color:#6366f1;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.q-flag-display{font-size:4rem;margin-bottom:8px;display:block;line-height:1;
+  filter:drop-shadow(2px 3px 6px rgba(0,0,0,.3))}
+.question-text{font-family:'Baloo 2',cursive;font-size:clamp(1.1rem,3vw,1.45rem);font-weight:800;color:var(--text);line-height:1.4;}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+@media(max-width:480px){.options-grid{grid-template-columns:1fr}}
+.opt-btn{background:var(--card);border:2.5px solid rgba(255,255,255,.12);border-radius:16px;
+  padding:15px 18px;font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;
+  color:var(--text);cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);
+  text-align:left;display:flex;align-items:center;gap:10px;}
+.opt-btn .opt-letter{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;transition:background .2s;}
+.opt-btn:hover:not(:disabled){border-color:#6366f1;background:#1e1b4b;transform:scale(1.02);}
+.opt-btn:hover:not(:disabled) .opt-letter{background:#6366f1}
+.opt-btn.correct{background:#052e16;border-color:var(--green);color:#4ade80}
+.opt-btn.correct .opt-letter{background:var(--green);color:white}
+.opt-btn.wrong{background:#1f0a0a;border-color:var(--red);color:#fca5a5}
+.opt-btn.wrong .opt-letter{background:var(--red);color:white}
+.opt-btn:disabled{pointer-events:none}
+.opt-btn.reveal-correct{border-color:var(--green)!important;background:#052e16!important;color:#4ade80!important}
+.feedback-box{border-radius:18px;padding:18px 20px;margin-bottom:14px;display:none;
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
+.feedback-box.correct{background:#052e16;border:2px solid #166534}
+.feedback-box.wrong{background:#1f0a0a;border:2px solid #7f1d1d}
+.feedback-box.show{display:block}
+.fb-title{font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;margin-bottom:6px}
+.fb-title.correct{color:#4ade80}.fb-title.wrong{color:#fca5a5}
+.fb-fact{font-size:.9rem;font-weight:700;color:var(--muted);line-height:1.5}
+.next-q-btn{display:none;font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;
+  padding:13px 32px;border-radius:999px;border:none;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;cursor:pointer;
+  box-shadow:0 5px 0 #3730a3;transition:all .2s;}
+.next-q-btn.show{display:inline-block}
+.next-q-btn:hover{transform:translateY(-2px);box-shadow:0 7px 0 #3730a3}
+.streak-strip{display:flex;align-items:center;gap:8px;margin-bottom:16px;
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:.9rem;color:var(--muted);}
+.streak-flames{display:flex;gap:3px}
+.flame{font-size:1.2rem;opacity:.2;transition:all .3s}
+.flame.lit{opacity:1;filter:drop-shadow(0 0 4px #f97316)}
+
+/* RESULTS */
+.results-center{text-align:center;padding:20px 0}
+.results-trophy{font-size:6rem;animation:bounceIn .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bounceIn{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+.results-grade{font-family:'Baloo 2',cursive;font-size:3rem;font-weight:900;margin:8px 0;}
+.results-subtitle{color:var(--muted);font-size:1rem;font-weight:700;margin-bottom:28px}
+.results-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:440px;margin:0 auto 32px;}
+.r-stat{background:var(--card);border:2px solid var(--border);border-radius:18px;padding:18px 12px;text-align:center;}
+.r-stat-val{font-family:'Baloo 2',cursive;font-size:1.8rem;font-weight:900;color:var(--gold);display:block;}
+.r-stat-label{font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.answers-review{margin-bottom:32px;max-width:560px;margin-left:auto;margin-right:auto}
+.review-title{font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:14px;text-align:left}
+.review-item{display:flex;align-items:flex-start;gap:12px;background:var(--card);border-radius:14px;
+  padding:14px 16px;margin-bottom:8px;border:1.5px solid var(--border);}
+.review-item.r-correct{border-color:#166534}.review-item.r-wrong{border-color:#7f1d1d}
+.review-icon{font-size:1.3rem;flex-shrink:0;margin-top:1px}
+.review-q{font-size:.85rem;font-weight:700;color:var(--muted);margin-bottom:3px}
+.review-a{font-size:.9rem;font-weight:800;color:var(--text)}
+.review-a.right{color:#4ade80}
+.review-a.wrong-a{color:#fca5a5;text-decoration:line-through;margin-right:8px}
+.results-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.res-btn{font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;padding:13px 28px;
+  border-radius:999px;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.res-btn-primary{background:linear-gradient(135deg,#f97316,#ec4899);color:white;box-shadow:0 5px 0 #be185d;}
+.res-btn-primary:hover{transform:translateY(-2px);box-shadow:0 7px 0 #be185d}
+.res-btn-secondary{background:var(--card);color:var(--muted);border:2px solid var(--border);}
+.res-btn-secondary:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s both}
+.conf{position:fixed;pointer-events:none;z-index:1000;animation:confFall linear forwards;border-radius:2px;}
+@keyframes confFall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(540deg);opacity:0}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="explorer.html" class="nav-logo">🌍 World Explorer</a>
+  <a href="explorer.html" class="nav-back">← Explore Countries</a>
+</nav>
+<div class="page">
+
+  <!-- HOME SCREEN -->
+  <div class="screen active" id="screen-home">
+    <div class="home-hero">
+      <div class="home-badge">🎯 Test your knowledge</div>
+      <h1 class="home-title"><span class="g1">Culture Quiz</span><br><span class="g2">Challenge!</span></h1>
+      <p class="home-sub">Answer questions about flags, capitals, foods, landmarks, and amazing facts from around the world!</p>
+    </div>
+    <div class="mode-grid">
+      <div class="mode-card mode-easy" onclick="startMode('easy')">
+        <span class="mode-icon">🌱</span>
+        <div class="mode-name">Explorer</div>
+        <div class="mode-desc">Flags, capitals & basic facts. Perfect for beginners!</div>
+        <span class="mode-badge easy">Easy · 8 Questions</span>
+      </div>
+      <div class="mode-card mode-medium" onclick="startMode('medium')">
+        <span class="mode-icon">🌍</span>
+        <div class="mode-name">Adventurer</div>
+        <div class="mode-desc">Food, culture & landmarks. A good challenge!</div>
+        <span class="mode-badge medium">Medium · 10 Questions</span>
+      </div>
+      <div class="mode-card mode-hard" onclick="startMode('hard')">
+        <span class="mode-icon">🏆</span>
+        <div class="mode-name">World Master</div>
+        <div class="mode-desc">All question types, tougher options, no hints!</div>
+        <span class="mode-badge hard">Hard · 12 Questions</span>
+      </div>
+      <div class="mode-card mode-continent" onclick="showContinentPicker()">
+        <span class="mode-icon">🗺️</span>
+        <div class="mode-name">By Continent</div>
+        <div class="mode-desc">Focus on one continent you want to master!</div>
+        <span class="mode-badge custom">Custom · You Choose</span>
+      </div>
+    </div>
+    <div id="continent-picker" style="display:none" class="fade-up">
+      <div class="continent-select-title">🌐 Choose a Continent</div>
+      <div class="continent-btns">
+        <button class="cont-btn sel-all" id="cb-all"      onclick="selContinent('all')">🌐 All</button>
+        <button class="cont-btn" id="cb-asia"             onclick="selContinent('asia')">🌏 Asia</button>
+        <button class="cont-btn" id="cb-europe"           onclick="selContinent('europe')">🏰 Europe</button>
+        <button class="cont-btn" id="cb-africa"           onclick="selContinent('africa')">🌅 Africa</button>
+        <button class="cont-btn" id="cb-americas"         onclick="selContinent('americas')">🌎 Americas</button>
+        <button class="cont-btn" id="cb-oceania"          onclick="selContinent('oceania')">🏝️ Oceania</button>
+      </div>
+      <button class="start-quiz-btn" onclick="startContinentQuiz()">Start Quiz! →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-header">
+      <div class="q-number" id="q-number">Q 1 / 10</div>
+      <div class="progress-wrap"><div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div></div>
+      <div class="q-score-pill">⭐ <span class="sv" id="live-score">0</span></div>
+    </div>
+    <div class="streak-strip">🔥 Streak:
+      <div class="streak-flames">
+        <span class="flame" id="f1">🔥</span><span class="flame" id="f2">🔥</span>
+        <span class="flame" id="f3">🔥</span><span class="flame" id="f4">🔥</span>
+        <span class="flame" id="f5">🔥</span>
+      </div>
+      <span id="streak-count" style="color:var(--gold)">0</span>
+    </div>
+    <div class="question-card">
+      <div class="q-type-badge" id="q-type-badge">🏳️ Flag Question</div>
+      <span class="q-flag-display" id="q-flag"></span>
+      <div class="question-text" id="q-text">Loading...</div>
+    </div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback-box" id="feedback-box">
+      <div class="fb-title" id="fb-title"></div>
+      <div class="fb-fact" id="fb-fact"></div>
+    </div>
+    <button class="next-q-btn" id="next-q-btn" onclick="nextQuestion()">Next Question →</button>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div class="screen" id="screen-results">
+    <div class="results-center">
+      <div class="results-trophy" id="res-trophy">🏆</div>
+      <div class="results-grade" id="res-grade"></div>
+      <div class="results-subtitle" id="res-subtitle"></div>
+      <div class="results-stats">
+        <div class="r-stat"><span class="r-stat-val" id="rs-score">0</span><div class="r-stat-label">Points</div></div>
+        <div class="r-stat"><span class="r-stat-val" id="rs-correct">0/0</span><div class="r-stat-label">Correct</div></div>
+        <div class="r-stat"><span class="r-stat-val" id="rs-pct">0%</span><div class="r-stat-label">Accuracy</div></div>
+      </div>
+      <div class="answers-review">
+        <div class="review-title">📋 Your Answers</div>
+        <div id="review-list"></div>
+      </div>
+      <div class="results-btns">
+        <button class="res-btn res-btn-primary" onclick="playAgain()">🔄 Play Again</button>
+        <a href="explorer.html" class="res-btn res-btn-secondary">🗺️ Keep Exploring</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const QB=[
+  {type:'flag',diff:'easy',  flag:'🇯🇵',q:'Which country does this flag belong to?',a:'Japan',    opts:['Japan','China','South Korea','Thailand'],       fact:'Japan\'s flag is called Nisshōki. The red circle represents the rising sun.'},
+  {type:'flag',diff:'easy',  flag:'🇧🇷',q:'Which country does this flag belong to?',a:'Brazil',   opts:['Brazil','Argentina','Colombia','Mexico'],       fact:'Brazil\'s green background represents forests, the yellow diamond represents gold, and the blue circle has 27 stars for its states!'},
+  {type:'flag',diff:'easy',  flag:'🇫🇷',q:'Which country does this flag belong to?',a:'France',   opts:['France','Italy','Belgium','Netherlands'],       fact:'France\'s tricolour flag was adopted after the French Revolution in 1789 and inspired flags worldwide.'},
+  {type:'flag',diff:'easy',  flag:'🇮🇳',q:'Which country does this flag belong to?',a:'India',    opts:['India','Sri Lanka','Nepal','Bangladesh'],       fact:'The blue wheel (Ashoka Chakra) in India\'s flag has 24 spokes representing the hours in a day.'},
+  {type:'flag',diff:'easy',  flag:'🇪🇬',q:'Which country does this flag belong to?',a:'Egypt',    opts:['Egypt','Iraq','Syria','Jordan'],                fact:'Egypt\'s flag features the golden Eagle of Saladin — a symbol of Arab strength since the 12th century.'},
+  {type:'flag',diff:'easy',  flag:'🇦🇺',q:'Which country does this flag belong to?',a:'Australia',opts:['Australia','New Zealand','Fiji','Canada'],       fact:'Australia\'s flag features the Union Jack, a seven-pointed star, and the Southern Cross constellation.'},
+  {type:'flag',diff:'easy',  flag:'🇲🇽',q:'Which country does this flag belong to?',a:'Mexico',   opts:['Mexico','Italy','Hungary','Ireland'],            fact:'Mexico\'s coat of arms shows an eagle eating a snake on a cactus — based on an ancient Aztec legend!'},
+  {type:'flag',diff:'medium',flag:'🇿🇦',q:'Which country does this flag belong to?',a:'South Africa',opts:['South Africa','Nigeria','Ghana','Zimbabwe'], fact:'South Africa\'s "Y" shaped flag was designed in 1994 to symbolise the convergence of its diverse peoples.'},
+  {type:'flag',diff:'medium',flag:'🇳🇿',q:'Which country does this flag belong to?',a:'New Zealand',opts:['New Zealand','Australia','Fiji','Tonga'],     fact:'New Zealand\'s flag features the Southern Cross — only visible in the Southern Hemisphere.'},
+  {type:'flag',diff:'medium',flag:'🇰🇷',q:'Which country does this flag belong to?',a:'South Korea',opts:['South Korea','China','Japan','Vietnam'],     fact:'South Korea\'s Taegukgi flag features a yin-yang and trigrams representing sky, water, earth, and fire.'},
+  {type:'flag',diff:'hard',  flag:'🇵🇬',q:'Which country does this flag belong to?',a:'Papua New Guinea',opts:['Papua New Guinea','Solomon Islands','Vanuatu','Samoa'],fact:'Papua New Guinea\'s flag has a Bird of Paradise and the Southern Cross on a diagonal red and black design.'},
+  {type:'flag',diff:'hard',  flag:'🇫🇯',q:'Which country does this flag belong to?',a:'Fiji',     opts:['Fiji','Samoa','Tonga','Palau'],                 fact:'Fiji\'s light blue flag symbolises the Pacific Ocean. Fiji is made up of 333 islands!'},
+  {type:'capital',diff:'easy',flag:'🇯🇵',q:'What is the capital city of Japan?',a:'Tokyo',opts:['Tokyo','Osaka','Kyoto','Hiroshima'],fact:'Tokyo is the world\'s most populous metropolitan area with over 37 million people!'},
+  {type:'capital',diff:'easy',flag:'🇫🇷',q:'What is the capital city of France?',a:'Paris',opts:['Paris','Lyon','Nice','Marseille'],fact:'Paris is called the "City of Light" — it was one of the first cities in Europe to use gas street lighting.'},
+  {type:'capital',diff:'easy',flag:'🇧🇷',q:'What is the capital city of Brazil?',a:'Brasília',opts:['Brasília','Rio de Janeiro','São Paulo','Salvador'],fact:'Brasília was built from scratch in just 41 months and became Brazil\'s capital in 1960, replacing Rio de Janeiro!'},
+  {type:'capital',diff:'easy',flag:'🇮🇳',q:'What is the capital city of India?',a:'New Delhi',opts:['New Delhi','Mumbai','Kolkata','Chennai'],fact:'New Delhi was built by the British in 1911. It sits right next to Old Delhi, which is over 400 years old!'},
+  {type:'capital',diff:'medium',flag:'🇦🇺',q:'What is the capital city of Australia?',a:'Canberra',opts:['Canberra','Sydney','Melbourne','Brisbane'],fact:'Most people guess Sydney or Melbourne, but Canberra was chosen as a compromise between those two rival cities!'},
+  {type:'capital',diff:'medium',flag:'🇨🇦',q:'What is the capital city of Canada?',a:'Ottawa',opts:['Ottawa','Toronto','Vancouver','Montreal'],fact:'Ottawa was chosen as Canada\'s capital by Queen Victoria in 1857. It sits on the border between Ontario and Quebec!'},
+  {type:'capital',diff:'hard',flag:'🇳🇿',q:'What is the capital city of New Zealand?',a:'Wellington',opts:['Wellington','Auckland','Christchurch','Dunedin'],fact:'Wellington is the southernmost capital city in the world and is known as the "Coolest Little Capital"!'},
+  {type:'capital',diff:'hard',flag:'🇵🇪',q:'What is the capital city of Peru?',a:'Lima',opts:['Lima','Cusco','Arequipa','Machu Picchu'],fact:'Lima was founded by Spanish conquistador Francisco Pizarro on January 6, 1535 — the Feast of the Epiphany!'},
+  {type:'food',diff:'easy',flag:'🇮🇹',q:'Which country is famous for inventing Pizza and Pasta?',a:'Italy',opts:['Italy','France','Spain','Greece'],fact:'The Margherita pizza was created in Naples in 1889 and named after Queen Margherita of Savoy!'},
+  {type:'food',diff:'easy',flag:'🇲🇽',q:'Which country gave the world tacos and guacamole?',a:'Mexico',opts:['Mexico','Spain','Colombia','Venezuela'],fact:'Mexico also gave the world chocolate! The Aztecs made a bitter cacao drink called "xocolatl" — the world\'s first chocolate.'},
+  {type:'food',diff:'easy',flag:'🇯🇵',q:'Sushi and ramen are traditional dishes from which country?',a:'Japan',opts:['Japan','China','South Korea','Vietnam'],fact:'Sushi started as a way to preserve fish in fermented rice. The fresh raw-fish version we know today developed in Tokyo in the 1800s!'},
+  {type:'food',diff:'medium',flag:'🇮🇳',q:'Biryani, curry, and samosas are beloved foods from which country?',a:'India',opts:['India','Pakistan','Bangladesh','Sri Lanka'],fact:'India has over 30 distinct regional cuisines! Each state has completely different dishes, spices, and cooking traditions.'},
+  {type:'food',diff:'medium',flag:'🇳🇬',q:'Jollof rice and egusi soup are traditional foods from which African country?',a:'Nigeria',opts:['Nigeria','Ghana','Senegal','Cameroon'],fact:'"Jollof Wars" — a famous friendly rivalry between Nigeria, Ghana, and Senegal about who makes the best jollof rice — is one of West Africa\'s best-known cultural debates!'},
+  {type:'food',diff:'hard',flag:'🇵🇪',q:'Ceviche — raw fish cured in lemon juice — is the national dish of which country?',a:'Peru',opts:['Peru','Chile','Ecuador','Colombia'],fact:'Peru is considered one of the world\'s top food destinations! Several Lima restaurants rank in the World\'s 50 Best Restaurants.'},
+  {type:'food',diff:'hard',flag:'🇲🇦',q:'Tagine and couscous originate from which North African country?',a:'Morocco',opts:['Morocco','Algeria','Tunisia','Egypt'],fact:'Couscous was added to UNESCO\'s Intangible Cultural Heritage list in 2020, shared by Morocco, Algeria, Tunisia, and Mauritania!'},
+  {type:'landmark',diff:'easy',flag:'🇪🇬',q:'The Great Pyramids and the Sphinx are found in which country?',a:'Egypt',opts:['Egypt','Iraq','Iran','Saudi Arabia'],fact:'The Great Pyramid was the tallest man-made structure on Earth for over 3,800 years — until England\'s Lincoln Cathedral surpassed it in 1311!'},
+  {type:'landmark',diff:'easy',flag:'🇫🇷',q:'The Eiffel Tower is located in which European country?',a:'France',opts:['France','Germany','Italy','Belgium'],fact:'The Eiffel Tower grows about 15cm taller in summer! Metal expands when heated, so it gets bigger in warm weather.'},
+  {type:'landmark',diff:'easy',flag:'🇨🇳',q:'The Great Wall is a famous landmark in which country?',a:'China',opts:['China','Japan','Mongolia','India'],fact:'You cannot see the Great Wall from space with the naked eye — that is a popular myth! It is only about 5-8 metres wide.'},
+  {type:'landmark',diff:'medium',flag:'🇮🇳',q:'The Taj Mahal — a symbol of eternal love — is found in which country?',a:'India',opts:['India','Pakistan','Bangladesh','Afghanistan'],fact:'The Taj Mahal changes colour throughout the day — pinkish at dawn, brilliant white in the afternoon, and golden at night!'},
+  {type:'landmark',diff:'medium',flag:'🇧🇷',q:'The giant statue "Christ the Redeemer" stands in which country?',a:'Brazil',opts:['Brazil','Argentina','Colombia','Peru'],fact:'Christ the Redeemer was constructed in France and shipped to Brazil piece by piece! It was voted a New Seven Wonder of the World in 2007.'},
+  {type:'landmark',diff:'hard',flag:'🇵🇪',q:'Machu Picchu — the "Lost City of the Incas" — is in which South American country?',a:'Peru',opts:['Peru','Bolivia','Ecuador','Colombia'],fact:'Machu Picchu was built around 1450 AD and abandoned about 100 years later. It was unknown to the outside world until 1911!'},
+  {type:'landmark',diff:'hard',flag:'🇬🇷',q:'The ancient Parthenon temple sits on the Acropolis hill in which country?',a:'Greece',opts:['Greece','Italy','Turkey','Cyprus'],fact:'The Parthenon was built without any mortar! Ancient Greeks cut the marble blocks so precisely they locked together by weight and friction alone.'},
+  {type:'fact',diff:'easy',flag:'🇯🇵',q:'Which country has more vending machines per person than anywhere else on Earth?',a:'Japan',opts:['Japan','South Korea','USA','Germany'],fact:'Japan has about 1 vending machine for every 23 people — over 5 million machines selling hot food, drinks, umbrellas, and more!'},
+  {type:'fact',diff:'easy',flag:'🇦🇺',q:'Which country is both a continent AND a country at the same time?',a:'Australia',opts:['Australia','Russia','Brazil','Canada'],fact:'Australia is the world\'s sixth-largest country AND the only nation that governs an entire continent all by itself!'},
+  {type:'fact',diff:'medium',flag:'🇮🇳',q:'Which country invented the number zero?',a:'India',opts:['India','Egypt','Greece','China'],fact:'Indian mathematician Brahmagupta formally defined zero in 628 AD. Without zero, modern computers and mathematics would be impossible!'},
+  {type:'fact',diff:'medium',flag:'🇧🇷',q:'Which country contains about 60% of the Amazon Rainforest?',a:'Brazil',opts:['Brazil','Peru','Colombia','Bolivia'],fact:'The Amazon produces about 20% of Earth\'s oxygen. The trees release so much water vapour they create their own "flying rivers" in the sky!'},
+  {type:'fact',diff:'medium',flag:'🇿🇦',q:'Which country has 11 official languages?',a:'South Africa',opts:['South Africa','India','Switzerland','Canada'],fact:'South Africa\'s 11 official languages include Zulu and Xhosa (which has amazing clicking sounds!). All languages are equal under the constitution.'},
+  {type:'fact',diff:'hard',flag:'🇳🇿',q:'Which country was the FIRST in the world to give women the right to vote?',a:'New Zealand',opts:['New Zealand','Australia','Finland','Norway'],fact:'New Zealand granted women the vote in 1893 — 27 years before the USA did in 1920!'},
+  {type:'fact',diff:'hard',flag:'🇲🇦',q:'Which country is home to the world\'s oldest continuously operating university?',a:'Morocco',opts:['Morocco','Egypt','Iraq','Iran'],fact:'The University of Al Quaraouiyine in Fez was founded in 859 AD — over 1,160 years ago — by a woman named Fatima al-Fihri!'},
+  {type:'fact',diff:'hard',flag:'🇵🇬',q:'Which country has more languages spoken in it than any other country on Earth?',a:'Papua New Guinea',opts:['Papua New Guinea','India','Nigeria','Indonesia'],fact:'Papua New Guinea has over 800 languages — about 12% of ALL languages on Earth in just one country!'},
+];
+
+const CONT_MAP={
+  asia:['Japan','China','India','Thailand','Saudi Arabia','South Korea'],
+  europe:['France','Italy','Germany','Greece','Spain'],
+  africa:['Egypt','Nigeria','Kenya','South Africa','Morocco'],
+  americas:['Brazil','Mexico','United States','Peru','Canada'],
+  oceania:['Australia','New Zealand','Fiji','Papua New Guinea'],
+};
+
+let questions=[],qIdx=0,score=0,streak=0,answers=[],currentQ=null,answered=false,selCont='all';
+const LETTERS=['A','B','C','D'];
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startMode(mode){
+  document.getElementById('continent-picker').style.display='none';
+  const countMap={easy:8,medium:10,hard:12};
+  let pool=QB.filter(q=>mode==='easy'?q.diff==='easy':mode==='medium'?['easy','medium'].includes(q.diff):true);
+  questions=shuffle([...pool]).slice(0,countMap[mode]);
+  launchQuiz();
+}
+
+function showContinentPicker(){
+  const el=document.getElementById('continent-picker');
+  el.style.display=el.style.display==='none'?'block':'none';
+  selCont='all';
+  document.querySelectorAll('.cont-btn').forEach(b=>b.className='cont-btn');
+  document.getElementById('cb-all').classList.add('sel-all');
+}
+
+function selContinent(c){
+  selCont=c;
+  document.querySelectorAll('.cont-btn').forEach(b=>b.className='cont-btn');
+  document.getElementById('cb-'+c).classList.add('sel-'+c);
+}
+
+function startContinentQuiz(){
+  let pool=QB;
+  if(selCont!=='all'){
+    const cc=CONT_MAP[selCont]||[];
+    const filtered=QB.filter(q=>cc.includes(q.a));
+    if(filtered.length>=4)pool=filtered;
+  }
+  questions=shuffle([...pool]).slice(0,10);
+  launchQuiz();
+}
+
+function launchQuiz(){
+  qIdx=0;score=0;streak=0;answers=[];
+  showScreen('quiz');loadQuestion();
+}
+
+function loadQuestion(){
+  if(qIdx>=questions.length){showResults();return;}
+  currentQ=questions[qIdx];answered=false;
+  document.getElementById('q-number').textContent=`Q ${qIdx+1} / ${questions.length}`;
+  document.getElementById('progress-fill').style.width=(qIdx/questions.length*100)+'%';
+  document.getElementById('live-score').textContent=score;
+  const typeLabels={flag:'🏳️ Flag Question',capital:'🏙️ Capital City',food:'🍽️ Food & Culture',landmark:'🏛️ Landmark',fact:'💡 Fun Fact'};
+  document.getElementById('q-type-badge').textContent=typeLabels[currentQ.type]||'❓ Question';
+  document.getElementById('q-flag').textContent=currentQ.flag;
+  document.getElementById('q-text').textContent=currentQ.q;
+  const shuffled=shuffle([...currentQ.opts]);
+  const grid=document.getElementById('options-grid');
+  grid.innerHTML='';
+  shuffled.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    btn.innerHTML=`<div class="opt-letter">${LETTERS[i]}</div><span>${opt}</span>`;
+    btn.onclick=()=>checkAnswer(opt,btn);
+    grid.appendChild(btn);
+  });
+  document.getElementById('feedback-box').className='feedback-box';
+  document.getElementById('next-q-btn').classList.remove('show');
+  updateStreakUI();
+}
+
+function checkAnswer(chosen,btnEl){
+  if(answered)return;answered=true;
+  const correct=chosen===currentQ.a;
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+    b.disabled=true;
+    if(b.querySelector('span').textContent===currentQ.a)b.classList.add(correct?'correct':'reveal-correct');
+  });
+  if(!correct)btnEl.classList.add('wrong');
+  if(correct){score+=streak>=3?15:streak>=1?12:10;streak++;}
+  else{streak=0;}
+  updateStreakUI();
+  document.getElementById('live-score').textContent=score;
+  const fb=document.getElementById('feedback-box');
+  const title=document.getElementById('fb-title');
+  if(correct){
+    const msgs=['🎉 Brilliant!','⭐ Correct!','🔥 Amazing!','✨ You got it!','🌟 Excellent!'];
+    title.textContent=msgs[Math.floor(Math.random()*msgs.length)];
+    title.className='fb-title correct';fb.className='feedback-box correct show';confetti(30);
+  }else{
+    title.textContent=`❌ Not quite — it was ${currentQ.a}!`;
+    title.className='fb-title wrong';fb.className='feedback-box wrong show';
+  }
+  document.getElementById('fb-fact').textContent='💡 '+currentQ.fact;
+  answers.push({q:currentQ.q,correct,chosen,actual:currentQ.a,flag:currentQ.flag});
+  document.getElementById('next-q-btn').classList.add('show');
+}
+
+function nextQuestion(){qIdx++;loadQuestion();}
+
+function updateStreakUI(){
+  document.getElementById('streak-count').textContent=streak;
+  for(let i=1;i<=5;i++)document.getElementById('f'+i).classList.toggle('lit',i<=streak);
+}
+
+function showResults(){
+  showScreen('results');
+  const correct=answers.filter(a=>a.correct).length;
+  const total=answers.length;
+  const pct=Math.round((correct/total)*100);
+  const g=pct===100?{t:'🏆',g:'Perfect!',c:'#fbbf24'}:pct>=80?{t:'🌟',g:'Excellent!',c:'#34d399'}:
+          pct>=60?{t:'👍',g:'Good Job!',c:'#60a5fa'}:pct>=40?{t:'📚',g:'Keep Going',c:'#f97316'}:{t:'🌍',g:'Explorer',c:'#a78bfa'};
+  document.getElementById('res-trophy').textContent=g.t;
+  const gEl=document.getElementById('res-grade');
+  gEl.textContent=g.g;
+  gEl.style.background=`linear-gradient(135deg,${g.c},#f97316)`;
+  gEl.style.webkitBackgroundClip='text';gEl.style.webkitTextFillColor='transparent';gEl.style.backgroundClip='text';
+  document.getElementById('res-subtitle').textContent=pct>=60?'Amazing work, World Explorer! Keep discovering! 🌍':'Great try! Visit the Explorer page to learn more facts! 📚';
+  document.getElementById('rs-score').textContent=score;
+  document.getElementById('rs-correct').textContent=`${correct}/${total}`;
+  document.getElementById('rs-pct').textContent=pct+'%';
+  document.getElementById('review-list').innerHTML=answers.map(a=>`
+    <div class="review-item ${a.correct?'r-correct':'r-wrong'}">
+      <div class="review-icon">${a.correct?'✅':'❌'}</div>
+      <div><div class="review-q">${a.flag} ${a.q}</div>
+      <div class="review-a">${!a.correct?`<span class="wrong-a">${a.chosen}</span>`:''}<span class="${a.correct?'right':''}">${a.actual}</span></div></div>
+    </div>`).join('');
+  if(pct>=80)confetti(80);
+}
+
+function playAgain(){showScreen('home');}
+
+const CC=['#fbbf24','#f97316','#ec4899','#6366f1','#22c55e','#38bdf8','#a78bfa'];
+function confetti(n=40){
+  for(let i=0;i<n;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');el.className='conf';
+      el.style.cssText=`left:${Math.random()*100}vw;top:0;background:${CC[Math.floor(Math.random()*CC.length)]};
+        width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
+        border-radius:${Math.random()>.5?'50%':'3px'};
+        animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*.4}s;`;
+      document.body.appendChild(el);setTimeout(()=>el.remove(),3000);
+    },i*20);
+  }
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+</script>
+</body>
+</html>
